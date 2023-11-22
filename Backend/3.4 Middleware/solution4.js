@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 function bandNameGenerator(req, res, next) {
   console.log(req.body);
+  console.log(typeof req.body["street"]);
   bandName = req.body["street"] + req.body["pet"];
   next();
 }

@@ -1,9 +1,5 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const port = 3000;
@@ -11,13 +7,14 @@ const port = 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
+  res.render("index.ejs");
 });
 
 app.post("/submit", (req, res) => {
-  console.log(req.body);
+  const numLetters = req.body["fName"].length + req.body["lName"].length;
+  res.render("index.ejs", { numberOfLetters: numLetters });
 });
 
 app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
