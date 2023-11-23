@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import axios from "axios";
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -25,7 +25,37 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/", async (req, res) => {
-  console.log(req.body);
+  let url = "https://bored-api.appbrewery.com/filter?";
+  if (req.body.type != "") {
+    url += `type=${req.body.type}`;
+  }
+  if (req.body.participants != "") {
+    url += `participants=${req.body.participants}`;
+  }
+
+  try {
+    const response = await axios.get(url);
+    let responseData = response.data;
+
+    let activityObj;
+    if (Array.isArray(responseData)) {
+      activityObj =
+        responseData[Math.floor(Math.random() * responseData.length)];
+    } else if (typeof responseData === "object") {
+      activityObj = responseData;
+    }
+
+    res.render("index.ejs", { data: activityObj });
+    return;
+  } catch (error) {
+    console.log(error);
+    if (error.response.status == 404) {
+      res.render("index.ejs", { error: "No activities that match your criteria." });
+    } else {
+      res.render("index.ejs", { error: error.message });
+    }
+    return;
+  }
 
   // Step 2: Play around with the drop downs and see what gets logged.
   // Use axios to make an API request to the /filter endpoint. Making
