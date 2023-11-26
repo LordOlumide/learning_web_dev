@@ -16,11 +16,19 @@ app.get("/random", (req, res) => {
 
 //2. GET a specific joke
 app.get("/jokes/:id", (req, res) => {
-  const joke = jokes.filter((joke) => joke.id == req.params.id)[0];
+  const id = parseInt(req.params.id);
+  const joke = jokes.find((joke) => joke.id === id);
   res.json(joke);
 });
 
 //3. GET a jokes by filtering on the joke type
+app.get("/filter", (req, res) => {
+  const matchingJokes = jokes.filter(function(joke) {
+    return joke.jokeType.toLowerCase() == req.query.type.toLowerCase()
+  });
+  console.log(matchingJokes);
+  res.json(matchingJokes);
+});
 
 //4. POST a new joke
 
