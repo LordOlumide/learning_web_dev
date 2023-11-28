@@ -31,8 +31,40 @@ app.get("/filter", (req, res) => {
 });
 
 //4. POST a new joke
+app.post("/jokes", (req, res) => {
+  let highestIndex = 0;
+  jokes.forEach((joke) => {
+    if (joke.id > highestIndex) {
+      highestIndex = joke.id;
+    }
+  });
+  const joke = {
+    id: highestIndex + 1,
+    jokeText: req.body["text"],
+    jokeType: req.body["type"],
+  };
+  jokes.push(joke);
+  res.json(joke);
+});
 
 //5. PUT a joke
+app.put("/jokes/:id", (req, res) => {
+  try {
+    let jokeIndex = jokes.findIndex(
+      function (item) {
+        console.log(`ID: ${item.id}`);
+        return item.id === parseInt(req.params.id);
+      }
+    );
+    console.log(jokes[jokeIndex]);
+    jokes[jokeIndex].jokeText = req.body.text;
+    jokes[jokeIndex].jokeType = req.body.type;
+    
+    res.json(jokes[jokeIndex]);
+  } catch (error) {
+    res.statusCode(500);
+  }
+});
 
 //6. PATCH a joke
 
