@@ -23,8 +23,8 @@ app.get("/jokes/:id", (req, res) => {
 
 //3. GET a jokes by filtering on the joke type
 app.get("/filter", (req, res) => {
-  const matchingJokes = jokes.filter(function(joke) {
-    return joke.jokeType.toLowerCase() == req.query.type.toLowerCase()
+  const matchingJokes = jokes.filter(function (joke) {
+    return joke.jokeType.toLowerCase() == req.query.type.toLowerCase();
   });
   console.log(matchingJokes);
   res.json(matchingJokes);
@@ -51,15 +51,11 @@ app.post("/jokes", (req, res) => {
 app.put("/jokes/:id", (req, res) => {
   try {
     let jokeIndex = jokes.findIndex(
-      function (item) {
-        console.log(`ID: ${item.id}`);
-        return item.id === parseInt(req.params.id);
-      }
+      (item) => item.id === parseInt(req.params.id)
     );
-    console.log(jokes[jokeIndex]);
     jokes[jokeIndex].jokeText = req.body.text;
     jokes[jokeIndex].jokeType = req.body.type;
-    
+
     res.json(jokes[jokeIndex]);
   } catch (error) {
     res.statusCode(500);
@@ -67,6 +63,23 @@ app.put("/jokes/:id", (req, res) => {
 });
 
 //6. PATCH a joke
+app.patch("/jokes/:id", (req, res) => {
+  try {
+    let jokeIndex = jokes.findIndex(
+      (item) => item.id === parseInt(req.params.id)
+    );
+    if (req.body.text) {
+      jokes[jokeIndex].jokeText = req.body.text;
+    }
+    if (req.body.type) {
+      jokes[jokeIndex].jokeType = req.body.type;
+    }
+    
+    res.json(jokes[jokeIndex]);
+  } catch (error) {
+    res.statusCode(500);
+  }
+});
 
 //7. DELETE Specific joke
 
