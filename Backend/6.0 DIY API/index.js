@@ -68,13 +68,9 @@ app.patch("/jokes/:id", (req, res) => {
     let jokeIndex = jokes.findIndex(
       (item) => item.id === parseInt(req.params.id)
     );
-    if (req.body.text) {
-      jokes[jokeIndex].jokeText = req.body.text;
-    }
-    if (req.body.type) {
-      jokes[jokeIndex].jokeType = req.body.type;
-    }
-    
+    req.body.text ? (jokes[jokeIndex].jokeText = req.body.text) : null;
+    req.body.type ? (jokes[jokeIndex].jokeType = req.body.type) : null;
+
     res.json(jokes[jokeIndex]);
   } catch (error) {
     res.statusCode(500);
@@ -82,8 +78,29 @@ app.patch("/jokes/:id", (req, res) => {
 });
 
 //7. DELETE Specific joke
+app.delete("/jokes/:id", (req, res) => {
+  let jokeIndex = jokes.findIndex(
+    (item) => item.id === parseInt(req.params.id)
+  );
+  if (jokeIndex === -1) {
+    res
+      .status(404)
+      .json({ error: `Joke with id: ${req.params.id} not found.` });
+  } else {
+    jokes.splice(jokeIndex, 1);
+    res.sendStatus(200);
+  }
+});
 
 //8. DELETE All jokes
+app.delete("/all", (req, res) => {
+  if (req.query.key === masterKey) {
+    jokes = [];
+    res.sendStatus(200);
+  } else {
+    res.sendStatus(401);
+  }
+});
 
 app.listen(port, () => {
   console.log(`Successfully started server on port ${port}.`);
