@@ -17,31 +17,53 @@ db.connect();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-app.get("/", async (req, res) => {
+async function checkVisited() {
   const results = await db.query("SELECT country_code FROM visited_countries");
   let countries = [];
   results.rows.forEach((row) => {
     countries.push(row.country_code);
   });
+  return countries;
+}
+
+app.get("/", async (req, res) => {
+  let countries = await checkVisited();
   res.render("index.ejs", { countries: countries, total: countries.length });
 });
 
 app.post("/add", async (req, res) => {
   let newCountry = req.body.country;
   console.log(newCountry);
+
   let results = await db.query(
-    "SELECT country_Code FROM countries WHERE country = $1",
-    [newCountry]
+    "SELECT country_Code FROM countries WHERE LOWER(country) LIKE '%' || $1 || '%'",
+    [newCountry.toLowerCase()]
   );
 
-  if (results.rows.length !== 0) {
+  if (results.rows.length === 0) {
+    let countries = await checkVisited();
+    return res.render("index.ejs", {
+      countries: countries,
+      total: countries.length,
+      error: "Country does not exist. Please try again",
+    });
+  }
+
+  try {
     let countryCode = results.rows[0].country_code;
     console.log(countryCode);
     await db.query("INSERT INTO visited_countries (country_code) VALUES ($1)", [
       countryCode,
     ]);
+    res.redirect("/");
+  } catch (error) {
+    let countries = await checkVisited();
+    return res.render("index.ejs", {
+      countries: countries,
+      total: countries.length,
+      error: "Country has already been added. Try again",
+    });
   }
-  res.redirect("/");
 });
 
 app.listen(port, () => {
