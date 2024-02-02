@@ -57,18 +57,19 @@ app.post("/login", async (req, res) => {
     const email = req.body["username"];
     const password = req.body["password"];
 
-    const results = await db.query("SELECT email, password FROM users WHERE email = $1", [
-      email,
-    ]);
+    const results = await db.query(
+      "SELECT email, password FROM users WHERE email = $1",
+      [email]
+    );
     if (results.rows.length == 1) {
       const userObj = results.rows[0];
-      if (userObj['password'] == password) {
-        res.redirect('/secrets');
+      if (userObj["password"] == password) {
+        res.redirect("/secrets");
       } else {
-        throw Error('Password is incorrect');
+        throw Error("Password is incorrect");
       }
     } else {
-      throw Error('User does not exist');
+      throw Error("User does not exist");
     }
   } catch (error) {
     console.log(error);
