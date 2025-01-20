@@ -1,8 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
-import bcrypt from "bcrypt";
-import { hash } from "bcrypt";
+import bcrypt from "bcrypt"; 
 
 const app = express();
 const port = 3000;
@@ -65,7 +64,7 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const email = req.body.username;
-  const password = req.body.password;
+  const loginPassword = req.body.password;
 
   try {
     const result = await db.query("SELECT * FROM users WHERE email = $1", [
@@ -75,7 +74,7 @@ app.post("/login", async (req, res) => {
       const user = result.rows[0];
       const storedHash = user["hash"];
 
-      bcrypt.compare(password, storedHash, (err, result) => {
+      bcrypt.compare(loginPassword, storedHash, (err, result) => {
         if (err) {
           throw Error("Invalid password: " + err);
         } else {
