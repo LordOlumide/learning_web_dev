@@ -11,7 +11,7 @@ app.use(express.static("public"));
 const db = new pg.Client({
   user: "postgres",
   host: "localhost",
-  database: "secrets_site",
+  database: "secrets_site_0",
   password: "KingBoss",
   port: "5432",
 });
@@ -38,7 +38,7 @@ app.post("/register", async (req, res) => {
       email,
     ]);
     if (checkExists.rows.length > 0) {
-      // Should be handled
+      throw Error("User is already registered!");
     }
 
     await db.query("INSERT INTO users (email, password) VALUES ($1, $2)", [
@@ -61,9 +61,14 @@ app.post("/login", async (req, res) => {
       "SELECT email, password FROM users WHERE email = $1",
       [email]
     );
-    if (results.rows.length == 1) {
+    console.log(results.rows[0]);
+    if (results.rows.length > 0) {
       const userObj = results.rows[0];
-      if (userObj["password"] == password) {
+      const storedPassword = userObj["password"];
+      console.log("storedPassword: " + storedPassword);
+      console.log("password: " + password);
+
+      if (password == storedPassword) {
         res.redirect("/secrets");
       } else {
         throw Error("Password is incorrect");
